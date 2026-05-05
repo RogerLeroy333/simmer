@@ -58,7 +58,7 @@ export default function PreviewPage() {
       const saved = await response.json();
       sessionStorage.removeItem('importedRecipe');
       sessionStorage.removeItem('importSource');
-      router.push(`/recipe/${saved.id}`);
+      router.push('/library');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save recipe');
       setSaving(false);
