@@ -2,7 +2,7 @@
 
 :root {
   --bg:#481110;--bg2:#5A1D1B;--bg3:#6B2926;--bgDeep:#3A0D0C;
-  --cream:#F4EBD9;--cream80:rgba(244,235,217,0.8);--cream60:rgba(244,235,217,0.6);--cream30:rgba(244,235,217,0.45);--cream15:rgba(244,235,217,0.15);--cream06:rgba(244,235,217,0.06);
+  --cream:#F4EBD9;--cream80:rgba(244,235,217,0.8);--cream60:rgba(244,235,217,0.6);--cream30:rgba(244,235,217,0.6);--cream15:rgba(244,235,217,0.25);--cream06:rgba(244,235,217,0.06);
   --terra:#CB5331;--terraBg:rgba(203,83,49,0.12);--sage:#68886B;--sageBg:rgba(104,136,107,0.1);--gold:#D4A853;
   --fd:'Bebas Neue',sans-serif;--fs:'Playfair Display',serif;--fb:'Oswald',sans-serif;
 }
