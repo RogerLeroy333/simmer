@@ -93,3 +93,95 @@ html, body{height:100%;overflow:hidden}
 /* FAB */
 .fab{position:absolute;bottom:92px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--terra);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:16;box-shadow:0 4px 20px rgba(203,83,49,0.35);transition:all 0.2s}
 .fab:active{transform:scale(0.92);box-shadow:0 2px 12px rgba(203,83,49,0.5)}
+
+/* Pill button */
+.pill-btn{font-family:var(--fb);font-weight:300;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cream30);background:transparent;border:1px solid var(--cream30);border-radius:24px;padding:8px 16px;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.pill-btn:active{border-color:var(--cream);color:var(--cream);transform:scale(0.97)}
+
+/* ===== LIBRARY ===== */
+.lib-scroll{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:56px 28px 100px;scrollbar-width:none}
+.lib-scroll::-webkit-scrollbar{display:none}
+.lib-title{font-family:var(--fd);font-size:36px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;line-height:1;margin-bottom:8px}
+.lib-subtitle{font-family:var(--fs);font-style:italic;font-size:14px;color:var(--cream30);margin-bottom:28px}
+.lib-smart-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:28px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.lib-smart-row::-webkit-scrollbar{display:none}
+.lib-smart-chip{flex-shrink:0;font-family:var(--fb);font-weight:300;font-size:12px;letter-spacing:0.5px;color:var(--cream60);background:var(--bgDeep);border:1px solid var(--cream06);border-radius:20px;padding:10px 16px;cursor:pointer;white-space:nowrap;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.lib-smart-chip:active{border-color:var(--cream15);transform:scale(0.97)}
+.lib-smart-chip.active{border-color:var(--terra);color:var(--cream);background:var(--terraBg)}
+.lib-smart-chip .lsc-count{font-family:var(--fb);font-weight:400;font-size:10px;color:var(--cream30);background:var(--cream06);border-radius:8px;padding:2px 6px;margin-left:2px}
+.lib-collections{margin-bottom:28px}
+.lib-coll-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.lib-coll-title{font-family:var(--fd);font-size:20px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.lib-coll-line{flex:1;height:1px;background:var(--cream15)}
+.lib-coll-add{font-family:var(--fb);font-weight:300;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--terra);cursor:pointer;background:none;border:none;padding:0;min-height:44px;display:flex;align-items:center;gap:4px}
+.lib-coll-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lib-folder{background:var(--bg2);border:1px solid var(--cream06);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden}
+.lib-folder:active{transform:scale(0.97);border-color:var(--cream15)}
+.lib-folder-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.lib-folder-name{font-family:var(--fd);font-size:16px;color:var(--cream);letter-spacing:0.5px;text-transform:uppercase;line-height:1.2;margin-bottom:4px}
+.lib-folder-count{font-family:var(--fb);font-weight:300;font-size:11px;color:var(--cream30);letter-spacing:0.5px}
+.lib-folder.add-new{border-style:dashed;border-color:var(--cream15);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:110px;gap:8px}
+.lib-folder.add-new .lib-folder-name{color:var(--cream30);font-size:13px}
+.lib-all-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.lib-all-title{font-family:var(--fd);font-size:20px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.lib-all-line{flex:1;height:1px;background:var(--cream15)}
+.lib-all-count{font-family:var(--fb);font-weight:300;font-size:11px;color:var(--cream30);letter-spacing:0.5px;white-space:nowrap}
+.lib-recipe-list{display:flex;flex-direction:column;gap:2px}
+.lib-recipe{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--cream06);cursor:pointer;transition:all 0.15s;align-items:center}
+.lib-recipe:active{background:rgba(244,235,217,0.02)}
+.lib-recipe:last-child{border-bottom:none}
+.lib-recipe-thumb{width:52px;height:52px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lib-recipe-thumb .lrt-letter{font-family:var(--fd);font-size:20px;color:var(--cream15)}
+.lib-recipe-info{flex:1}
+.lib-recipe-name{font-family:var(--fd);font-size:16px;color:var(--cream);letter-spacing:0.5px;text-transform:uppercase;line-height:1.2;margin-bottom:4px}
+.lib-recipe-meta{font-family:var(--fs);font-style:italic;font-size:11px;color:var(--cream30)}
+.lib-recipe-arrow{color:var(--cream15)}
+
+/* ===== RECIPE IMPORT ===== */
+.ri-scroll{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:56px 28px 100px;scrollbar-width:none}
+.ri-scroll::-webkit-scrollbar{display:none}
+.ri-title{font-family:var(--fd);font-size:36px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;line-height:1;margin-bottom:8px}
+.ri-subtitle{font-family:var(--fs);font-style:italic;font-size:14px;color:var(--cream30);margin-bottom:32px}
+.ri-method{background:var(--bg2);border:1px solid var(--cream06);border-radius:16px;padding:24px 20px;margin-bottom:16px;cursor:pointer;transition:all 0.2s;display:flex;gap:16px;align-items:center}
+.ri-method:active{transform:scale(0.98);border-color:var(--cream15);background:var(--bg3)}
+.ri-method-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ri-method-info{flex:1}
+.ri-method-name{font-family:var(--fd);font-size:20px;color:var(--cream);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
+.ri-method-desc{font-family:var(--fs);font-style:italic;font-size:13px;color:var(--cream30);line-height:1.5}
+.ri-method-arrow{color:var(--cream15)}
+.ri-divider{display:flex;align-items:center;gap:16px;margin:24px 0}
+.ri-divider-line{flex:1;height:1px;background:var(--cream06)}
+.ri-divider-text{font-family:var(--fb);font-weight:300;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream15)}
+.ri-url-area{margin-top:8px}
+.ri-input-wrap{display:flex;align-items:center;gap:12px;background:var(--bgDeep);border:1px solid var(--cream15);border-radius:14px;padding:14px 16px;transition:border-color 0.2s}
+.ri-input-wrap:focus-within{border-color:var(--terra)}
+.ri-input{flex:1;font-family:var(--fb);font-weight:300;font-size:14px;color:var(--cream);background:transparent;border:none;outline:none;letter-spacing:0.3px}
+.ri-input::placeholder{color:var(--cream30)}
+.ri-paste-btn{font-family:var(--fb);font-weight:300;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--terra);background:none;border:none;cursor:pointer;padding:8px;min-height:44px;display:flex;align-items:center}
+.ri-go-btn{width:100%;font-family:var(--fd);font-size:18px;letter-spacing:2px;text-transform:uppercase;color:var(--cream);background:var(--terra);border:none;border-radius:24px;padding:16px 0;cursor:pointer;min-height:52px;margin-top:16px;transition:all 0.15s}
+.ri-go-btn:active{transform:scale(0.97);filter:brightness(0.9)}
+.ri-go-btn.disabled{opacity:0.25;pointer-events:none}
+
+/* ===== IMPORT LOADING ===== */
+.il-container{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:40px}
+.il-animation{width:120px;height:120px;position:relative;display:flex;align-items:center;justify-content:center}
+.il-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--cream06);animation:il-spin 3s linear infinite}
+.il-ring:nth-child(2){inset:10px;animation-duration:2.2s;animation-direction:reverse;border-color:var(--terra);opacity:0.4}
+.il-ring:nth-child(3){inset:20px;animation-duration:1.8s;border-color:var(--sage);opacity:0.3}
+@keyframes il-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.il-icon{position:relative;z-index:1}
+.il-text{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.il-title{font-family:var(--fd);font-size:28px;color:var(--cream);letter-spacing:1px;text-transform:uppercase}
+.il-sub{font-family:var(--fs);font-style:italic;font-size:14px;color:var(--cream30);max-width:260px;line-height:1.6}
+.il-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.il-step{font-family:var(--fb);font-weight:300;font-size:12px;letter-spacing:0.5px;color:var(--cream15);transition:color 0.4s}
+.il-step.active{color:var(--cream60)}
+.il-step.done{color:var(--sage)}
+
+/* ===== RECIPE IMPORT - Photo Upload ===== */
+.ri-photo-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.ri-photo-slot{width:80px;height:80px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all 0.15s}
+.ri-photo-slot.empty{background:var(--bgDeep);border:1.5px dashed var(--cream15)}
+.ri-photo-slot.filled{background:var(--sageBg);border:1.5px solid var(--sage)}
+.ri-photo-label{font-family:var(--fb);font-weight:300;font-size:9px;letter-spacing:0.5px;text-transform:uppercase}
+.ri-photo-hint{font-family:var(--fs);font-style:italic;font-size:12px;color:var(--cream30);line-height:1.5;margin-bottom:16px}
