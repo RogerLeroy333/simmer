@@ -185,3 +185,34 @@ html, body{height:100%;overflow:hidden}
 .ri-photo-slot.filled{background:var(--sageBg);border:1.5px solid var(--sage)}
 .ri-photo-label{font-family:var(--fb);font-weight:300;font-size:9px;letter-spacing:0.5px;text-transform:uppercase}
 .ri-photo-hint{font-family:var(--fs);font-style:italic;font-size:12px;color:var(--cream30);line-height:1.5;margin-bottom:16px}
+
+/* ===== RECIPE PREVIEW ===== */
+.rp-scroll{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:56px 28px 120px;scrollbar-width:none}
+.rp-scroll::-webkit-scrollbar{display:none}
+.rp-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--fb);font-weight:300;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);background:var(--sageBg);border:1px solid rgba(104,136,107,0.2);border-radius:20px;padding:6px 14px;margin-bottom:16px}
+.rp-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--sage)}
+.rp-title{font-family:var(--fd);font-size:40px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;line-height:1;margin-bottom:8px}
+.rp-source{font-family:var(--fs);font-style:italic;font-size:13px;color:var(--cream30);margin-bottom:24px;display:flex;align-items:center;gap:8px}
+.rp-source-icon{width:16px;height:16px;border-radius:4px;background:var(--cream06);display:flex;align-items:center;justify-content:center}
+.rp-meta{display:flex;gap:12px;margin-bottom:24px}
+.rp-meta-chip{flex:1;background:var(--bgDeep);border:1px solid var(--cream06);border-radius:12px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.rp-meta-val{font-family:var(--fd);font-size:20px;color:var(--cream);letter-spacing:0.5px}
+.rp-meta-lbl{font-family:var(--fb);font-weight:300;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream30)}
+.rp-section{margin-bottom:28px}
+.rp-sec-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rp-sec-title{font-family:var(--fd);font-size:18px;color:var(--cream);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.rp-sec-line{flex:1;height:1px;background:var(--cream15)}
+.rp-sec-count{font-family:var(--fb);font-weight:300;font-size:11px;color:var(--cream30);letter-spacing:0.5px;white-space:nowrap}
+.rp-ing-item{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--cream06)}
+.rp-ing-item:last-child{border-bottom:none}
+.rp-ing-name{font-family:var(--fb);font-weight:300;font-size:13px;color:var(--cream80);letter-spacing:0.3px}
+.rp-ing-amt{font-family:var(--fs);font-style:italic;font-size:12px;color:var(--cream30)}
+.rp-step-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream06)}
+.rp-step-item:last-child{border-bottom:none}
+.rp-step-num{font-family:var(--fd);font-size:14px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--cream30);border:1px solid var(--cream15)}
+.rp-step-text{font-family:var(--fb);font-weight:300;font-size:13px;color:var(--cream60);line-height:1.5;letter-spacing:0.3px}
+.rp-actions{position:absolute;bottom:0;left:0;right:0;padding:16px 28px 40px;background:linear-gradient(to top,var(--bg) 75%,transparent);z-index:15;display:flex;gap:10px}
+.rp-action{flex:1;font-family:var(--fd);font-size:16px;letter-spacing:1.5px;text-transform:uppercase;border-radius:24px;padding:16px 0;cursor:pointer;min-height:52px;text-align:center;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.rp-action:active{transform:scale(0.97)}
+.rp-action.primary{background:var(--terra);color:var(--cream);border:none}
+.rp-action.secondary{background:transparent;color:var(--cream60);border:1px solid var(--cream30)}

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 type ImportMethod = 'none' | 'url' | 'photo' | 'video';
@@ -10,23 +10,106 @@ export default function ImportPage() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
-  const [photos, setPhotos] = useState<number[]>([]);
+  const [error, setError] = useState('');
+  const [photos, setPhotos] = useState<{ file: File; preview: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImport = async () => {
     setLoading(true);
+    setError('');
     setLoadingStep(0);
-    for (let i = 0; i < 4; i++) {
-      await new Promise(r => setTimeout(r, 800));
-      setLoadingStep(i + 1);
+
+    try {
+      let body: Record<string, unknown>;
+
+      if (method === 'url') {
+        setLoadingStep(1); // Fetching page
+        body = { type: 'url', url };
+      } else if (method === 'video') {
+        setLoadingStep(1); // Fetching video
+        body = { type: 'video', url };
+      } else {
+        // Photo: convert files to base64
+        setLoadingStep(1);
+        const images = await Promise.all(
+          photos.map(async (p) => {
+            const buffer = await p.file.arrayBuffer();
+            const base64 = btoa(
+              new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+            return {
+              data: base64,
+              mediaType: p.file.type || 'image/jpeg',
+            };
+          })
+        );
+        body = { type: 'photo', images };
+      }
+
+      // Simulate step progression while waiting for API
+      const stepTimer = setInterval(() => {
+        setLoadingStep(prev => Math.min(prev + 1, 3));
+      }, 1500);
+
+      const response = await fetch('/api/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      clearInterval(stepTimer);
+      setLoadingStep(4); // All done
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Import failed');
+      }
+
+      const data = await response.json();
+
+      // Store the parsed recipe in sessionStorage so preview page can read it
+      sessionStorage.setItem('importedRecipe', JSON.stringify(data.recipe));
+      sessionStorage.setItem('importSource', url || 'Photo upload');
+
+      await new Promise(r => setTimeout(r, 500)); // Brief pause to show completion
+      router.push('/import/preview');
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
     }
-    router.push('/import/preview?id=2');
   };
 
-  const addPhoto = (num: number) => {
-    setPhotos(prev => prev.includes(num) ? prev : [...prev, num]);
+  const handlePhotoSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const newPhotos = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setPhotos(prev => [...prev, ...newPhotos]);
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(prev => {
+      const updated = [...prev];
+      URL.revokeObjectURL(updated[index].preview);
+      updated.splice(index, 1);
+      return updated;
+    });
   };
 
   if (loading) {
+    const steps = method === 'photo'
+      ? ['Reading images...', 'Extracting text...', 'Parsing recipe...', 'Organizing for Simmer...']
+      : method === 'video'
+      ? ['Fetching video page...', 'Reading captions...', 'Extracting recipe...', 'Organizing for Simmer...']
+      : ['Fetching page...', 'Extracting ingredients...', 'Parsing steps...', 'Organizing for Simmer...'];
+
     return (
       <div className="il-container">
         <div className="il-animation">
@@ -41,8 +124,8 @@ export default function ImportPage() {
           <div className="il-title">Importing recipe</div>
           <div className="il-sub">Reading, extracting, and organizing your recipe...</div>
           <div className="il-steps">
-            {['Fetching page...', 'Extracting ingredients...', 'Parsing steps...', 'Organizing for Simmer...'].map((step, i) => (
-              <div key={i} className={`il-step ${loadingStep > i ? 'done' : loadingStep === i ? 'active' : ''}`}>
+            {steps.map((step, i) => (
+              <div key={i} className={`il-step ${loadingStep > i + 1 ? 'done' : loadingStep >= i + 1 ? 'active' : ''}`}>
                 {step}
               </div>
             ))}
@@ -61,6 +144,12 @@ export default function ImportPage() {
 
         <div className="ri-title">Add a Recipe</div>
         <div className="ri-subtitle">Bring in a recipe from anywhere</div>
+
+        {error && (
+          <div style={{ background: 'rgba(203,83,49,0.15)', border: '1px solid var(--terra)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
+            <div style={{ fontFamily: 'var(--fb)', fontWeight: 300, fontSize: '13px', color: 'var(--cream)' }}>{error}</div>
+          </div>
+        )}
 
         {/* URL Method */}
         <div className="ri-method" onClick={() => setMethod('url')}>
@@ -112,12 +201,9 @@ export default function ImportPage() {
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder={method === 'url' ? 'https://recipes.com/...' : 'https://tiktok.com/... or instagram.com/reel/...'}
+                placeholder={method === 'url' ? 'https://recipes.com/...' : 'https://tiktok.com/...'}
                 className="ri-input"
               />
-              <button className="ri-paste-btn" onClick={() => setUrl('https://www.seriouseats.com/chicken-tikka-masala')}>
-                Paste
-              </button>
             </div>
             <button onClick={handleImport} className={`ri-go-btn ${!url ? 'disabled' : ''}`}>
               Import Recipe
@@ -133,26 +219,27 @@ export default function ImportPage() {
               <div className="ri-divider-text">Add photos</div>
               <div className="ri-divider-line" />
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
             <div className="ri-photo-grid">
-              {[1, 2, 3].map((num) => (
-                <div key={num} className={`ri-photo-slot ${photos.includes(num) ? 'filled' : 'empty'}`} onClick={() => addPhoto(num)}>
-                  {photos.includes(num) ? (
-                    <>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#68886B" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span className="ri-photo-label" style={{ color: 'var(--sage)' }}>ADDED</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(244,235,217,0.3)" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                      <span className="ri-photo-label" style={{ color: 'var(--cream30)' }}>
-                        {num <= 2 ? `PAGE ${num}` : 'MORE'}
-                      </span>
-                    </>
-                  )}
+              {photos.map((photo, i) => (
+                <div key={i} className="ri-photo-slot filled" onClick={() => removePhoto(i)}
+                     style={{ backgroundImage: `url(${photo.preview})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#68886B" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
               ))}
+              <div className="ri-photo-slot empty" onClick={handlePhotoSelect}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(244,235,217,0.3)" strokeWidth="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span className="ri-photo-label" style={{ color: 'var(--cream30)' }}>ADD</span>
+              </div>
             </div>
-            <div className="ri-photo-hint">Add as many photos as you need — we&apos;ll combine them into one recipe.</div>
+            <div className="ri-photo-hint">Tap photos to remove. Add as many as you need — we&apos;ll combine them into one recipe.</div>
             <button onClick={handleImport} className={`ri-go-btn ${photos.length === 0 ? 'disabled' : ''}`}>
               Extract Recipe
             </button>

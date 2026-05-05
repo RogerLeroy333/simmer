@@ -1,57 +1,191 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { sampleRecipes } from '@/lib/recipes-data';
+
+type ImportedRecipe = {
+  title: string;
+  subtitle?: string;
+  time_minutes: number;
+  difficulty: string;
+  servings: number;
+  cuisine: string;
+  tags: string[];
+  ingredients: { name: string; amount: string }[];
+  steps: { number: number; title: string; detail: string; sensory_cues?: string; milestone?: string }[];
+};
 
 export default function PreviewPage() {
   const router = useRouter();
-  const recipe = sampleRecipes[1];
+  const [recipe, setRecipe] = useState<ImportedRecipe | null>(null);
+  const [source, setSource] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('importedRecipe');
+    const storedSource = sessionStorage.getItem('importSource');
+    if (stored) {
+      setRecipe(JSON.parse(stored));
+      setSource(storedSource || '');
+    } else {
+      // No recipe in session — go back to import
+      router.push('/import');
+    }
+  }, [router]);
+
+  const handleSave = async () => {
+    if (!recipe) return;
+    setSaving(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...recipe,
+          source_url: source.startsWith('http') ? source : undefined,
+          source_name: getSourceName(source),
+          is_featured: false,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to save');
+      }
+
+      const saved = await response.json();
+      sessionStorage.removeItem('importedRecipe');
+      sessionStorage.removeItem('importSource');
+      router.push(`/recipe/${saved.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save recipe');
+      setSaving(false);
+    }
+  };
+
+  const handleDiscard = () => {
+    sessionStorage.removeItem('importedRecipe');
+    sessionStorage.removeItem('importSource');
+    router.push('/import');
+  };
+
+  if (!recipe) {
+    return (
+      <div className="il-container">
+        <div className="il-title">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full relative">
-      <div className="h-full overflow-y-auto pt-14 px-7 pb-32" style={{ WebkitOverflowScrolling: 'touch' }}>
-        <button onClick={() => router.push('/import')}
-                className="text-[12px] font-light tracking-[1px] uppercase px-4 py-2 rounded-3xl mb-4 min-h-[44px] transition-all active:scale-[0.97]"
-                style={{ fontFamily: 'var(--font-body)', color: 'var(--color-cream-30)', border: '1px solid var(--color-cream-30)' }}>
-          Back
-        </button>
-        <div className="inline-flex items-center gap-1.5 text-[10px] font-light tracking-[1.5px] uppercase rounded-full px-3.5 py-1.5 mb-4"
-             style={{ fontFamily: 'var(--font-body)', color: 'var(--color-sage)', background: 'var(--color-sage-bg)', border: '1px solid rgba(104,136,107,0.2)' }}>
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--color-sage)' }} />
+    <div style={{ height: '100%', position: 'relative' }}>
+      <div className="rp-scroll">
+        <button className="pill-btn" onClick={() => router.push('/import')} style={{ marginBottom: '16px' }}>Back</button>
+
+        <div className="rp-badge">
+          <span className="rp-badge-dot" />
           Successfully imported
         </div>
-        <h1 className="text-[40px] uppercase tracking-[1px] leading-none mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-cream)' }}>{recipe.title}</h1>
-        <p className="text-[13px] italic mb-6 flex items-center gap-2" style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-cream-30)' }}>{recipe.source_name}</p>
-        <div className="flex gap-3 mb-6">
-          {[{v:`${recipe.time_minutes}m`,l:'Time'},{v:recipe.difficulty?.slice(0,3),l:'Difficulty'},{v:String(recipe.servings),l:'Servings'}].map(m=>(
-            <div key={m.l} className="flex-1 flex flex-col items-center gap-1 rounded-xl py-3" style={{background:'var(--color-bg-deep)',border:'1px solid var(--color-cream-06)'}}>
-              <span className="text-[20px]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream)'}}>{m.v}</span>
-              <span className="text-[10px] font-light tracking-[1.5px] uppercase" style={{fontFamily:'var(--font-body)',color:'var(--color-cream-30)'}}>{m.l}</span>
+
+        <div className="rp-title">{recipe.title}</div>
+        {recipe.subtitle && (
+          <div className="rp-source">{recipe.subtitle}</div>
+        )}
+        {source && source.startsWith('http') && (
+          <div className="rp-source">
+            <div className="rp-source-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(244,235,217,0.3)" strokeWidth="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            </div>
+            {getSourceName(source)}
+          </div>
+        )}
+
+        <div className="rp-meta">
+          <div className="rp-meta-chip">
+            <div className="rp-meta-val">{recipe.time_minutes}m</div>
+            <div className="rp-meta-lbl">Time</div>
+          </div>
+          <div className="rp-meta-chip">
+            <div className="rp-meta-val">{recipe.difficulty?.slice(0, 3)}</div>
+            <div className="rp-meta-lbl">Difficulty</div>
+          </div>
+          <div className="rp-meta-chip">
+            <div className="rp-meta-val">{recipe.servings}</div>
+            <div className="rp-meta-lbl">Servings</div>
+          </div>
+        </div>
+
+        {/* Ingredients */}
+        <div className="rp-section">
+          <div className="rp-sec-head">
+            <div className="rp-sec-title">Ingredients</div>
+            <div className="rp-sec-line" />
+            <div className="rp-sec-count">{recipe.ingredients.length} items</div>
+          </div>
+          {recipe.ingredients.map((ing, i) => (
+            <div key={i} className="rp-ing-item">
+              <span className="rp-ing-name">{ing.name}</span>
+              <span className="rp-ing-amt">{ing.amount}</span>
             </div>
           ))}
         </div>
-        <div className="mb-7">
-          <div className="flex items-center gap-3 mb-3"><span className="text-[18px] uppercase tracking-[1px]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream)'}}>Ingredients</span><div className="flex-1 h-px" style={{background:'var(--color-cream-15)'}}/><span className="text-[11px] font-light" style={{fontFamily:'var(--font-body)',color:'var(--color-cream-30)'}}>{recipe.ingredients.length} items</span></div>
-          {recipe.ingredients.map((ing,i)=>(
-            <div key={i} className="flex justify-between items-baseline py-2.5" style={{borderBottom:i<recipe.ingredients.length-1?'1px solid var(--color-cream-06)':'none'}}>
-              <span className="text-[13px] font-light" style={{fontFamily:'var(--font-body)',color:'var(--color-cream-80)'}}>{ing.name}</span>
-              <span className="text-[12px] italic" style={{fontFamily:'var(--font-serif)',color:'var(--color-cream-30)'}}>{ing.amount}</span>
+
+        {/* Steps */}
+        <div className="rp-section">
+          <div className="rp-sec-head">
+            <div className="rp-sec-title">Steps</div>
+            <div className="rp-sec-line" />
+            <div className="rp-sec-count">{recipe.steps.length} steps</div>
+          </div>
+          {recipe.steps.map((step) => (
+            <div key={step.number} className="rp-step-item">
+              <div className="rp-step-num">{step.number}</div>
+              <div className="rp-step-text">{step.detail}</div>
             </div>
           ))}
         </div>
-        <div className="mb-7">
-          <div className="flex items-center gap-3 mb-3"><span className="text-[18px] uppercase tracking-[1px]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream)'}}>Steps</span><div className="flex-1 h-px" style={{background:'var(--color-cream-15)'}}/><span className="text-[11px] font-light" style={{fontFamily:'var(--font-body)',color:'var(--color-cream-30)'}}>{recipe.steps.length} steps</span></div>
-          {recipe.steps.map((step)=>(
-            <div key={step.number} className="flex gap-3 py-3" style={{borderBottom:step.number<recipe.steps.length?'1px solid var(--color-cream-06)':'none'}}>
-              <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center flex-shrink-0 text-[14px]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream-30)',border:'1px solid var(--color-cream-15)'}}>{step.number}</div>
-              <p className="text-[13px] font-light leading-[1.5]" style={{fontFamily:'var(--font-body)',color:'var(--color-cream-60)'}}>{step.detail}</p>
-            </div>
-          ))}
-        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(203,83,49,0.15)', border: '1px solid var(--terra)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
+            <div style={{ fontFamily: 'var(--fb)', fontWeight: 300, fontSize: '13px', color: 'var(--cream)' }}>{error}</div>
+          </div>
+        )}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 px-7 pb-10 pt-4 flex gap-2.5 z-10" style={{background:'linear-gradient(to top, var(--color-bg) 75%, transparent)'}}>
-        <button onClick={()=>router.push('/import')} className="flex-1 text-[16px] tracking-[1.5px] uppercase rounded-3xl py-4 min-h-[52px] transition-all active:scale-[0.97]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream-60)',border:'1px solid var(--color-cream-30)'}}>Discard</button>
-        <button onClick={()=>router.push('/recipe/2')} className="flex-1 text-[16px] tracking-[1.5px] uppercase rounded-3xl py-4 min-h-[52px] transition-all active:scale-[0.97]" style={{fontFamily:'var(--font-display)',color:'var(--color-cream)',background:'var(--color-terra)'}}>Save Recipe</button>
+
+      {/* Action buttons */}
+      <div className="rp-actions">
+        <button className="rp-action secondary" onClick={handleDiscard}>Discard</button>
+        <button className="rp-action primary" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Recipe'}
+        </button>
       </div>
     </div>
   );
+}
+
+function getSourceName(source: string): string {
+  if (!source || !source.startsWith('http')) return source || 'Imported';
+  try {
+    const host = new URL(source).hostname.replace('www.', '');
+    const names: Record<string, string> = {
+      'seriouseats.com': 'Serious Eats',
+      'bonappetit.com': 'Bon Appétit',
+      'cooking.nytimes.com': 'NYT Cooking',
+      'nytimes.com': 'NYT Cooking',
+      'halfbakedharvest.com': 'Half Baked Harvest',
+      'budgetbytes.com': 'Budget Bytes',
+      'smittenkitchen.com': 'Smitten Kitchen',
+      'foodnetwork.com': 'Food Network',
+      'allrecipes.com': 'Allrecipes',
+      'epicurious.com': 'Epicurious',
+      'delish.com': 'Delish',
+      'tiktok.com': 'TikTok',
+      'instagram.com': 'Instagram',
+    };
+    return names[host] || host;
+  } catch {
+    return 'Imported';
+  }
 }
