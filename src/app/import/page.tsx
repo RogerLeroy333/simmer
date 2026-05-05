@@ -139,7 +139,7 @@ export default function ImportPage() {
     <div style={{ height: '100%', position: 'relative' }}>
       <div className="ri-scroll">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <button className="pill-btn" onClick={() => router.back()}>Back</button>
+          <button className="pill-btn" onClick={() => router.push('/')}>Back</button>
         </div>
 
         <div className="ri-title">Add a Recipe</div>
