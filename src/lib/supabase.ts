@@ -15,10 +15,12 @@ function getSupabase(): SupabaseClient {
   return _supabase;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const supabase = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     const client = getSupabase();
-    const value = (client as Record<string, unknown>)[prop as string];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const value = (client as any)[prop];
     if (typeof value === 'function') {
       return value.bind(client);
     }
